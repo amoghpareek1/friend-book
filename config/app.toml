@@ -1,0 +1,5 @@
+dbname = "authapp"
+dbuser = "root"
+dbpassword = "root"
+jwtkey = "secret_key"
+sessionKey = "the-road-ahead"

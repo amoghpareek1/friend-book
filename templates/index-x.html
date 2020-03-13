@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html ng-app="app">
+
+<head>
+  <meta charset="utf-8">
+  <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+  <title>Auth App</title>
+  <base href="/">
+
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-notification/0.3.6/angular-ui-notification.min.css">
+  <link rel="stylesheet" href="public/css/semantic.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/trix/0.10.2/trix.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.6/angular.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/1.0.3/angular-ui-router.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-notification/0.3.6/angular-ui-notification.min.js">
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/trix/0.10.2/trix.js"></script>
+
+  <script src="public/js/lib/angular-semantic-ui.min.js"></script>
+  <script src="public/js/lib/angular-semantic-ui.min.js"></script>
+
+  <script src="public/js/app-x.js"></script>
+
+  <script src="public/js/service/main.js"></script>
+
+  <script src="public/js/configs/config-x.js"></script>
+
+</head>
+
+<body>
+  <div class="ui borderless top fixed inverted menu">
+
+    <a class="ui left item">
+      Auth App
+    </a>
+    <a class="item" ui-sref="signOut">Sign Out</a>
+  </div>
+
+  <div class="ui padded grid">
+    <div class="sixteen wide column">
+      <ui-view></ui-view>
+    </div>
+  </div>
+</body>
+
+</html>

@@ -1,0 +1,34 @@
+<div class="ui hidden section divider"></div>
+<div class="ui centered grid">
+	<div class="eight wide column">
+		<div class="ui raised very padded blue segment">
+			<h4 class="ui header">Sign In</h4>
+
+			<form class="ui form" ng-submit="ctrl.signIn()">
+				<div class="required field">
+					<label>Email</label>
+					<div class="ui input">
+						<input type="text" placeholder="Email" ng-model="ctrl.formData.Email" spellcheck="false">
+					</div>
+				</div>
+
+				<div class="required field">
+					<label>Password</label>
+					<div class="ui input">
+						<input type="password" placeholder="Password" ng-model="ctrl.formData.Password">
+					</div>
+				</div>
+
+				<div class="field">
+					<button class="ui mini blue compact button" ng-class="{loading: ctrl.requestInProgress}"
+						ng-disabled="ctrl.requestInProgress">
+						Sign In
+					</button>
+				</div>
+				<div class="field">
+					<a ui-sref="signUp">Don't have an account? Sign Up</a>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
