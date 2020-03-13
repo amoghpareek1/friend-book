@@ -7,11 +7,15 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	ses "github.com/sourcegraph/go-ses"
 )
 
 const (
-	errServer   = "Server error. Please contact your system administrator."
-	accessToken = "token"
+	errServer       = "Server error. Please contact your system administrator."
+	accessToken     = "token"
+	initialize      = "init"
+	requestSent     = "request sent"
+	requestApproved = "request approved"
 )
 
 var (
@@ -24,6 +28,12 @@ var (
 	jwtKey = []byte(Config().GetString("jwtkey"))
 
 	sessionStore = sessions.NewCookieStore([]byte(Config().GetString("sessionKey")))
+
+	sesConfig = ses.Config{
+		Endpoint:        Config().GetString("sesEndpoint"),
+		AccessKeyID:     Config().GetString("sesAccessKeyID"),
+		SecretAccessKey: Config().GetString("sesSecretAccessKey"),
+	}
 )
 
 func init() {
@@ -44,4 +54,5 @@ func init() {
 	}
 
 	gormDatabase.AutoMigrate(&User{})
+	gormDatabase.AutoMigrate(&Friendship{})
 }

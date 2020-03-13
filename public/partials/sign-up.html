@@ -8,20 +8,22 @@
       <form class="ui form" ng-submit="ctrl.submit()">
         <div class="two fields">
           <div class="required field">
-            <label>First Name</label>
+            <label>Name</label>
             <div class="ui input">
               <input type="text"
-                placeholder="First Name"
-                ng-model="ctrl.formData.FirstName"
+                placeholder="Name"
+                ng-model="ctrl.formData.Name"
                 spellcheck="false">
             </div>
           </div>
           <div class="required field">
-            <label>Last Name</label>
+            <label>Phone</label>
             <div class="ui input">
-              <input type="text"
-                placeholder="Last Name"
-                ng-model="ctrl.formData.LastName">
+              <input type="tel"
+                max="10"
+                min="8"
+                placeholder="Phone"
+                ng-model="ctrl.formData.Phone">
             </div>
           </div>
         </div>

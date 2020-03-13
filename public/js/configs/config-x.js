@@ -13,8 +13,21 @@ angular.module('app').config(['$locationProvider', '$stateProvider', '$urlRouter
             window.location = window.location.origin + '/api/v1/sign-out'
         }
     })
-    .state('home',{
+    .state('user',{
         url: '/',
-        templateUrl: 'public/partials/home.html',
+        templateUrl: 'public/partials/user.html',
+        redirectTo: 'user.list'
+    })
+
+    .state('user.list',{
+        url: 'list',
+        templateUrl: 'public/partials/user-list.html',
+        controller: 'UsersListController as ctrl'
+    })
+
+    .state('user.edit',{
+        url: 'edit',
+        templateUrl: 'public/partials/user-edit.html',
+        controller: 'UserEditController as ctrl'
     })
 }])

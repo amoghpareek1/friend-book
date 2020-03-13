@@ -1,0 +1,54 @@
+<table class="ui striped small borderlesss table">
+    <thead>
+        <tr>
+            <h4 class="ui header">Registered Users</h4>
+        </tr>
+        <tr>
+            <th class="crscr" ng-click="ctrl.toggleOrderBy('name')">
+                Name
+                <span ng-if="ctrl.filters.OrderBy === 'name'">
+                    <i class="caret up icon" ng-if="ctrl.filters.SortBy === 'ASC'"></i>
+                    <i class="caret down icon" ng-if="ctrl.filters.SortBy === 'DESC'"></i>
+                </span>
+            </th>
+            <th class="crscr" ng-click="ctrl.toggleOrderBy('created_at')">
+                Date Created
+                <span ng-if="ctrl.filters.OrderBy === 'created_at'">
+                    <i class="caret up icon" ng-if="ctrl.filters.SortBy === 'ASC'"></i>
+                    <i class="caret down icon" ng-if="ctrl.filters.SortBy === 'DESC'"></i>
+                </span>
+            </th>
+            <th class="crscr" ng-click="ctrl.toggleOrderBy('email')">
+                Email
+                <span ng-if="ctrl.filters.OrderBy === 'email'">
+                    <i class="caret up icon" ng-if="ctrl.filters.SortBy === 'ASC'"></i>
+                    <i class="caret down icon" ng-if="ctrl.filters.SortBy === 'DESC'"></i>
+                </span>
+            </th>
+            <th class="wide">
+                Actions
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <tr>
+            <td colspan="9" ng-if="ctrl.users.length === 0">
+                No Users
+            </td>
+        </tr>
+        <tr ng-repeat="user in ctrl.users track by $index">
+            <td ng-bind="user.Name"></td>
+            <td ng-bind="user.CreatedAt | date: 'dd/MM/yy'"></td>
+            <td ng-bind="user.Email"></td>
+            <td>
+                <a class="ui mini icon compact button" title="Sign In As">
+                    <i class="sign in icon"></i>
+                </a>
+                <a class="ui mini icon compact button" title="Delete User">
+                    <i class="trash icon"></i>
+                </a>
+            </td>
+        </tr>
+    </tbody>
+</table>

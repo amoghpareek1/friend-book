@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
-  <title>Auth App</title>
+  <title>Friend Book</title>
   <base href="/">
 
   <link rel="stylesheet"
@@ -27,14 +27,19 @@
 
   <script src="public/js/configs/config-x.js"></script>
 
+  <script src="public/js/controllers/main-x.js"></script>
+  <script src="public/js/controllers/users-list.js"></script>
+  <script src="public/js/controllers/user-edit.js"></script>
+
 </head>
 
-<body>
+<body ng-controller="MainXController as main" ng-cloak>
   <div class="ui borderless top fixed inverted menu">
 
-    <a class="ui left item">
-      Auth App
+    <a class="ui left item" ui-sref="user.list">
+      Friend Book
     </a>
+    <a class="item" ui-sref="user.edit">{{main.me.Name}}</a>
     <a class="item" ui-sref="signOut">Sign Out</a>
   </div>
 

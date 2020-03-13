@@ -23,7 +23,7 @@ func signUpHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	r.Body.Close()
 
-	if user.Email == "" || user.Password == "" || user.FirstName == "" || user.LastName == "" {
+	if user.Email == "" || user.Password == "" || user.Name == "" || user.Phone == "" {
 		sendResponse(w, false, "All fields marked (*) are required.")
 		return
 	}
@@ -36,12 +36,15 @@ func signUpHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if len(user.Phone) != 10 {
+		sendResponse(w, false, "Phone number is not valid.")
+		return
+	}
+
 	var existingUser User
-	gormDatabase.Model(&User{}).Where(&User{
-		Email: user.Email,
-	}).Find(&existingUser)
+	gormDatabase.Model(&User{}).Where("email = ? OR phone = ?", user.Email, user.Phone).Find(&existingUser)
 	if existingUser.ID != "" {
-		sendResponse(w, false, "This email address is already registered with us.")
+		sendResponse(w, false, "User with this email address or phone number is already registered with us.")
 		return
 	}
 

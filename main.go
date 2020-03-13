@@ -7,8 +7,8 @@ import (
 	"log"
 
 	"github.com/NYTimes/gziphandler"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/rs/cors"
 )
 
@@ -19,7 +19,12 @@ func main() {
 	router.HandleFunc("/api/v1/sign-up", signUpHandler).Methods("POST")
 	router.HandleFunc("/api/v1/sign-in", signInHandler).Methods("POST")
 	router.HandleFunc("/api/v1/sign-out", signOutHandler).Methods("GET")
-	router.HandleFunc("/api/v1/validate", validateHandler).Methods("GET")
+	router.HandleFunc("/api/v1/get-me", getMeHandler).Methods("GET")
+	router.HandleFunc("/api/v1/get/users", getUsersHandler).Methods("GET")
+	router.HandleFunc("/api/v1/user/update", updateUserHandler).Methods("PUT")
+	router.HandleFunc("/api/v1/user/delete", deleteUserHandler).Methods("DELETE")
+
+	router.HandleFunc("/api/v1/send-friend-request", sendFriendRequestHandler).Methods("POST")
 
 	router.PathPrefix("/public/").Handler(http.StripPrefix("/public/", http.FileServer(http.Dir("./public")))).Methods("GET")
 

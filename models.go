@@ -10,12 +10,23 @@ import (
 type User struct {
 	CreatedAt time.Time
 	DeletedAt *time.Time `sql:"index"`
-	ID        string     `gorm:"type:uuid;primary_key;"`
+	ID        string     `gorm:"primary_key"`
 	UpdatedAt time.Time
-	FirstName string
-	LastName  string
+	Name      string
 	Password  string
 	Email     string
+	Phone     string
+	Friends   []User
+}
+
+// Friend ... this will keep track of id that who is connected with whom
+type Friendship struct {
+	CreatedAt time.Time
+	DeletedAt *time.Time `sql:"index"`
+	ID        string     `gorm:"primary_key"`
+	ToUser    string
+	FromUser  string
+	Status    string
 }
 
 // Response ...

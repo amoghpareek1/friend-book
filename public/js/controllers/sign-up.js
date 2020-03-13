@@ -2,8 +2,8 @@ angular.module('app').controller('SignUpController', ['MainService', 'Notificati
     var _self = this
 
     _self.formData = {
-        'FirstName'    : '',
-        'LastName': '',
+        'Name'    : '',
+        'Phone': '',
         'Password': '',
         'Email': ''
     }
