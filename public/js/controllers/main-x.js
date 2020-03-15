@@ -1,4 +1,4 @@
-angular.module('app').controller('MainXController', ['MainService', function (MainService) {
+angular.module('app').controller('MainXController', ['MainService', '$state', function (MainService, $state) {
 	var _self = this
 
 	_self.me = {}

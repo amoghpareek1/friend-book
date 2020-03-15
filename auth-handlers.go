@@ -5,10 +5,8 @@ import (
 	"log"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/badoux/checkmail"
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gofrs/uuid"
 	"github.com/gorilla/sessions"
 	"golang.org/x/crypto/bcrypt"
@@ -108,70 +106,11 @@ func signInHandler(w http.ResponseWriter, r *http.Request) {
 
 	session.Values["userID"] = userX.ID
 
-	expirationTime := time.Now().Add(10 * time.Minute)
-
-	claims := &Claims{
-		Username: user.Email,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expirationTime.Unix(),
-		},
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	tokenString, err := token.SignedString(jwtKey)
-	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	http.SetCookie(w, &http.Cookie{
-		Name:    accessToken,
-		Value:   tokenString,
-		Expires: expirationTime,
-	})
-
 	session.Options.HttpOnly = true
 
 	session.Save(r, w)
 
 	sendResponse(w, true, "Sign in successful.")
-}
-
-func validateHandler(w http.ResponseWriter, r *http.Request) {
-	// We can obtain the session token from the requests cookies, which come with every request
-	c, err := r.Cookie("token")
-	if err != nil {
-		if err == http.ErrNoCookie {
-			sendResponse(w, false, "Unauthorised Request.")
-			return
-		}
-		sendResponse(w, false, "Bad Request.")
-		return
-	}
-
-	tknStr := c.Value
-
-	claims := &Claims{}
-
-	tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
-		return jwtKey, nil
-	})
-	if err != nil {
-		if err == jwt.ErrSignatureInvalid {
-			sendResponse(w, false, "Unauthorised Request.")
-			return
-		}
-		sendResponse(w, false, "Bad Request.")
-		return
-	}
-	if !tkn.Valid {
-		sendResponse(w, false, "Unauthorised Request.")
-		return
-	}
-
-	sendResponse(w, true, "Request is valid.")
 }
 
 func signOutHandler(w http.ResponseWriter, r *http.Request) {

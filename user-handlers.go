@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 )
@@ -30,16 +31,49 @@ func getMeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	q := "SELECT * FROM users WHERE id != ? AND id IN (SELECT to_user FROM friendships WHERE to_user = ? OR from_user = ?)"
+	var friendships []Friendship
+	gormDatabase.Model(&Friendship{}).
+		Select("to_user, from_user").
+		Where("to_user = ? OR from_user = ?", user.ID, user.ID).
+		Find(&friendships)
 
-	gormDatabase.Raw(q, user.ID, user.ID, user.ID).Scan(&user.Friends)
+	mapOfUniqueUserIDs := make(map[string]string, 0)
+	sliceOfUserIDs := make([]string, 0)
 
-	log.Println("users -----", user.Friends)
+	for _, v := range friendships {
+		if _, ok := mapOfUniqueUserIDs[v.FromUser]; !ok {
+			mapOfUniqueUserIDs[v.FromUser] = v.FromUser
+			sliceOfUserIDs = append(sliceOfUserIDs, v.FromUser)
+		}
+
+		if _, ok1 := mapOfUniqueUserIDs[v.ToUser]; !ok1 {
+			mapOfUniqueUserIDs[v.ToUser] = v.ToUser
+			sliceOfUserIDs = append(sliceOfUserIDs, v.ToUser)
+		}
+	}
+
+	gormDatabase.Model(&User{}).
+		Where("id != ? AND id IN (?)", user.ID, sliceOfUserIDs).
+		Find(&user.Friends)
 
 	sendResponse(w, true, user)
 }
 
-func getUsersHandler(w http.ResponseWriter, r *http.Request) {
+func getUserHandler(w http.ResponseWriter, r *http.Request) {
+	type ResponseData struct {
+		User
+		Status string
+	}
+
+	vars := mux.Vars(r)
+
+	userID := vars["userID"]
+
+	if userID == "" {
+		sendResponse(w, false, "Invalid userID recieved.")
+		return
+	}
+
 	session, err := sessionStore.Get(r, "user-session")
 	if err != nil {
 		log.Println(err)
@@ -51,34 +85,98 @@ func getUsersHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	users := make([]User, 0)
+	userID2 := session.Values["userID"].(string)
 
+	var user User
+	gormDatabase.Model(&User{}).Where(&User{
+		ID: userID,
+	}).Find(&user)
+
+	if user.ID == "" {
+		sendResponse(w, false, "No such user exists.")
+		return
+	}
+
+	var responseData ResponseData
+
+	responseData.User = user
+
+	var friendship Friendship
+	gormDatabase.Model(&Friendship{}).
+		Where("(from_user = ? AND to_user = ?) OR (to_user = ? AND from_user = ?)", userID2, userID, userID, userID2).
+		First(&friendship)
+
+	if friendship.ID != "" {
+		responseData.Status = friendship.Status
+	}
+
+	sendResponse(w, true, responseData)
+}
+
+func getUsersHandler(w http.ResponseWriter, r *http.Request) {
+	type ResponseData struct {
+		Users      []User
+		TotalCount int
+	}
+
+	session, err := sessionStore.Get(r, "user-session")
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	if session.Values["userID"] == nil {
+		sendResponse(w, false, "Invalid request.")
+		return
+	}
+
+	userID := session.Values["userID"].(string)
+	users := make([]User, 0)
 	values := r.URL.Query()
 
 	sortBy := values.Get("SortBy")
 	orderBy := values.Get("OrderBy")
+	searchBy := values.Get("searchBy")
+	limit, _ := strconv.Atoi(values.Get("limit"))
+	offset, _ := strconv.Atoi(values.Get("offset"))
 
-	if orderBy == "name" {
-		gormDatabase.Model(&User{}).Order("LOWER("+orderBy+") "+sortBy).Where("id != ?", session.Values["userID"].(string)).Find(&users)
-	} else {
-		gormDatabase.Model(&User{}).Order(orderBy+" "+sortBy).Where("id != ?", session.Values["userID"].(string)).Find(&users)
+	if offset < 0 || limit == 0 {
+		sendResponse(w, false, "Invalid request.")
+		return
 	}
 
-	// userID := session.Values["userID"].(string)
-	// q := "SELECT * FROM users WHERE id != ? AND id IN (SELECT to_user FROM friendships WHERE to_user = ? OR from_user = ?)"
+	orderByClauseValue := ""
 
-	// var userss []User
-	// gormDatabase.Raw(q, userID, userID, userID).Scan(&userss)
-	// userID := session.Values["userID"].(string)
-	// q := "SELECT * FROM users WHERE id != ? AND id IN (SELECT to_user FROM friendships WHERE to_user = ? OR from_user = ?)"
+	if orderBy == "name" {
+		orderByClauseValue = "LOWER(" + orderBy + ") " + sortBy
+	} else {
+		orderByClauseValue = orderBy + " " + sortBy
+	}
 
-	// var userss []User
-	// gormDatabase.Raw(q, userID, userID, userID).Scan(&userss)
+	if searchBy != "" {
+		gormDatabase.Model(&User{}).
+			Order(orderByClauseValue).
+			Where("id != ? AND (LOWER(name) LIKE ? OR LOWER(email) LIKE ?)", userID, searchBy+"%", searchBy+"%").
+			Limit(limit).
+			Offset(offset).
+			Find(&users)
+	} else {
+		gormDatabase.Model(&User{}).
+			Order(orderByClauseValue).
+			Where("id != ?", userID).
+			Limit(limit).
+			Offset(offset).
+			Find(&users)
+	}
 
-	// log.Println(userss)
-	// log.Println(userss)
+	var responseData ResponseData
+	responseData.Users = users
 
-	sendResponse(w, true, users)
+	var totalCount int
+	gormDatabase.Model(&User{}).Where("id != ?", userID).Count(&totalCount)
+	responseData.TotalCount = totalCount
+
+	sendResponse(w, true, responseData)
 }
 
 func updateUserHandler(w http.ResponseWriter, r *http.Request) {
@@ -113,21 +211,32 @@ func updateUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	gormDatabase.Model(&User{}).Save(&user)
+	existingUser.Name = user.Name
+	existingUser.Phone = user.Phone
+	existingUser.Email = user.Email
+
+	gormDatabase.Model(&User{}).Save(&existingUser)
 
 	sendResponse(w, true, "Details Updated.")
 }
 
 func deleteUserHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	if vars["userID"] == "" {
-		sendResponse(w, false, "Invalid Request.")
+	session, err := sessionStore.Get(r, "user-session")
+	if err != nil {
+		log.Println(err)
 		return
 	}
 
+	if session.Values["userID"] == nil {
+		sendResponse(w, false, "Invalid request.")
+		return
+	}
+
+	userID := session.Values["userID"].(string)
+
 	var existingUser User
 	gormDatabase.Where(&User{
-		ID: vars["userID"],
+		ID: userID,
 	}).First(&existingUser)
 	if existingUser.ID == "" {
 		sendResponse(w, false, "No such user exists.")
@@ -136,8 +245,10 @@ func deleteUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	var friendships []Friendship
 	gormDatabase.Model(&Friendship{}).
-		Where("toUser = ? OR fromUser = ?", existingUser.ID, existingUser.ID).
+		Where("to_user = ? OR from_user = ?", existingUser.ID, existingUser.ID).
 		Delete(&friendships)
 
 	gormDatabase.Model(&User{}).Delete(&existingUser)
+
+	sendResponse(w, true, "Profile deleted.")
 }

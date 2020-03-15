@@ -11,11 +11,10 @@ import (
 )
 
 const (
-	errServer       = "Server error. Please contact your system administrator."
-	accessToken     = "token"
-	initialize      = "init"
-	requestSent     = "request sent"
-	requestApproved = "request approved"
+	errServer             = "Server error. Please contact your system administrator."
+	requestInProcess      = "Request in process"
+	friendRequestSent     = "Friend Request Sent"
+	friendRequestApproved = "Friend Request Approved"
 )
 
 var (
@@ -24,8 +23,6 @@ var (
 	dbname     = Config().GetString("dbname")
 	dbpassword = Config().GetString("dbpassword")
 	dbuser     = Config().GetString("dbuser")
-
-	jwtKey = []byte(Config().GetString("jwtkey"))
 
 	sessionStore = sessions.NewCookieStore([]byte(Config().GetString("sessionKey")))
 

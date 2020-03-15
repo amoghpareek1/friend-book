@@ -4,7 +4,7 @@
 <div class="ui grid">
     <div class="thirteen wide centered column">
         <div class="ui padded segment">
-            <h3 class="ui header">Edit User Details</h3>
+            <h3 class="ui header">{{ctrl.userDetails.Name}}'s Details</h3>
 
             <div class="ui hidden divider"></div>
 
@@ -12,14 +12,14 @@
                 <div class="two fields">
                     <div class="required field">
                         <label>Name</label>
-                        <div class="ui input">
+                        <div class="ui disabled input">
                             <input placeholder="Name" ng-model="ctrl.userDetails.Name">
                         </div>
                     </div>
                     
                     <div class="required field">
                         <label>Phone</label>
-                        <div class="ui input">
+                        <div class="ui disabled input">
                             <input placeholder="Phone" ng-model="ctrl.userDetails.Phone">
                         </div>
                     </div>
@@ -28,9 +28,8 @@
                 <div class="two fields">
                     <div class="required field">
                         <label>Email</label>
-                        <div class="ui input">
-                            <input placeholder="Email" type="email" 
-                                ng-model="ctrl.userDetails.Email">
+                        <div class="ui disabled input">
+                            <input placeholder="Email" type="email" ng-model="ctrl.userDetails.Email">
                         </div>
                     </div>
                 </div>
@@ -39,31 +38,26 @@
                     <button 
                         class="ui mini blue compact button"
                         ng-class="{loading: ctrl.requestInProgress}"
-                        ng-disabled="ctrl.requestInProgress">
-                        Save
+                        ng-disabled="ctrl.requestInProgress"
+                        ng-if="ctrl.userDetails.Status === ''"
+                        ng-click="ctrl.sendFriendRequest()">
+                        Send Friend request
+                    </button>
+                    <button 
+                        class="ui mini blue compact button"
+                        ng-class="{loading: ctrl.requestInProgress}"
+                        ng-disabled="ctrl.requestInProgress"
+                        ng-if="ctrl.userDetails.Status == 'Friend Request Approved'">
+                        Remove Friend
+                    </button>
+                    <button 
+                        class="ui mini blue compact disabled button"
+                        ng-if="ctrl.userDetails.status != 'Friend Request Approved' && 
+                            ctrl.userDetails.Status != ''">
+                        {{ctrl.userDetails.Status}}
                     </button>
                 </div>
             </form>
-        </div>
-    </div>
-</div>
-
-<div class="ui grid">
-    <div class="thirteen wide centered column">
-        <div class="ui padded segment">
-            <h3 class="ui header">Friends</h3>
-            <div class="ui hidden divider"></div>
-            <div class="ui list"
-                ng-if="ctrl.userDetails.Friends > 0"
-                ng-repeat="friend in ctrl.userDetails.Friends track by $index">
-                <div class="item">
-                  <i class="user icon"></i>
-                  <div class="content">
-                    {{friend.Name}}
-                  </div>
-                </div>
-            </div>
-            <h4 class="ui header">Not connect with any friend yet.</h4>
         </div>
     </div>
 </div>

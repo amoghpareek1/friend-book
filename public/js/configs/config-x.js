@@ -25,6 +25,12 @@ angular.module('app').config(['$locationProvider', '$stateProvider', '$urlRouter
         controller: 'UsersListController as ctrl'
     })
 
+    .state('user.view',{
+        url: 'view/:userID',
+        templateUrl: 'public/partials/user-view.html',
+        controller: 'UserViewController as ctrl'
+    })
+
     .state('user.edit',{
         url: 'edit',
         templateUrl: 'public/partials/user-edit.html',

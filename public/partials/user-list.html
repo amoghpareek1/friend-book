@@ -1,7 +1,24 @@
-<table class="ui striped small borderlesss table">
+ <table class="ui striped small borderlesss table">
     <thead>
         <tr>
             <h4 class="ui header">Registered Users</h4>
+            <th class="right aligned" colspan="6">
+                <button class="ui small blue compact button"
+                    id="deleteButton"  
+                    ng-click="ctrl.toggleDeleteUserModal()">
+                    Delete Profile
+                </button>
+            </th>
+        </tr>
+        <tr>
+            <div class="ui action input">
+                <input type="text" placeholder="Search Users..." 
+                    ng-model="ctrl.filters.searchBy">
+                <button class="ui blue button" 
+                    ng-click="ctrl.getUsers()">
+                    Search
+                </button>
+            </div>
         </tr>
         <tr>
             <th class="crscr" ng-click="ctrl.toggleOrderBy('name')">
@@ -42,13 +59,32 @@
             <td ng-bind="user.CreatedAt | date: 'dd/MM/yy'"></td>
             <td ng-bind="user.Email"></td>
             <td>
-                <a class="ui mini icon compact button" title="Sign In As">
-                    <i class="sign in icon"></i>
-                </a>
-                <a class="ui mini icon compact button" title="Delete User">
-                    <i class="trash icon"></i>
+                <a class="ui mini icon compact button" 
+                    title="View" 
+                    ui-sref="user.view({userID: user.ID})">
+                View
                 </a>
             </td>
         </tr>
     </tbody>
 </table>
+
+<div class="ui basic modal">
+    <div class="ui icon header">
+      <i class="archive icon"></i>
+      Delete User
+    </div>
+    <div class="content">
+      <p>Are you sure that you want to delete your profile?</p>
+    </div>
+    <div class="actions">
+      <div class="ui red basic cancel inverted button">
+        <i class="remove icon"></i>
+        Cancel
+      </div>
+      <div class="ui green ok inverted button" ng-click="ctrl.deleteUser()">
+        <i class="checkmark icon"></i>
+        Delete
+      </div>
+    </div>
+</div>

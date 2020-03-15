@@ -20,11 +20,18 @@ func main() {
 	router.HandleFunc("/api/v1/sign-in", signInHandler).Methods("POST")
 	router.HandleFunc("/api/v1/sign-out", signOutHandler).Methods("GET")
 	router.HandleFunc("/api/v1/get-me", getMeHandler).Methods("GET")
-	router.HandleFunc("/api/v1/get/users", getUsersHandler).Methods("GET")
+
+	router.HandleFunc("/api/v1/users/get", getUsersHandler).Methods("GET")
+
 	router.HandleFunc("/api/v1/user/update", updateUserHandler).Methods("PUT")
 	router.HandleFunc("/api/v1/user/delete", deleteUserHandler).Methods("DELETE")
+	router.HandleFunc("/api/v1/user/{userID}/get", getUserHandler).Methods("GET")
 
-	router.HandleFunc("/api/v1/send-friend-request", sendFriendRequestHandler).Methods("POST")
+	router.HandleFunc("/api/v1/send-friend-request/{userID}", sendFriendRequestHandler).Methods("POST")
+	router.HandleFunc("/api/v1/send-unfriend-request/{userID}", sendUnfriendRequestHandler).Methods("POST")
+
+	router.HandleFunc("/api/v1/recieve-friend-request/{friendshipID}", recieveFriendRequestHandler).Methods("GET")
+	router.HandleFunc("/api/v1/recieve-unfriend-request/{friendshipID}", recieveUnfriendRequestHandler).Methods("GET")
 
 	router.PathPrefix("/public/").Handler(http.StripPrefix("/public/", http.FileServer(http.Dir("./public")))).Methods("GET")
 
